@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat
 import java.util
 import java.util.TimeZone
 
+import com.typesafe.scalalogging.slf4j.StrictLogging
 import org.apache.kafka.connect.data._
 import org.apache.kafka.connect.errors.DataException
 import org.apache.kafka.connect.sink.SinkRecord
@@ -30,7 +31,7 @@ import org.json4s.JsonAST._
 
 import scala.collection.JavaConversions._
 
-object SinkRecordConverter {
+object SinkRecordConverter extends StrictLogging {
   private val ISO_DATE_FORMAT: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private val TIME_FORMAT: SimpleDateFormat = new SimpleDateFormat("HH:mm:ss.SSSZ")
 
@@ -96,8 +97,8 @@ object SinkRecordConverter {
                   schema.name match {
                     case Timestamp.LOGICAL_NAME =>
                       value match {
-                        case d: java.util.Date => ISO_DATE_FORMAT.format(d)
-                        case _ => ISO_DATE_FORMAT.format(Timestamp.toLogical(schema, value.asInstanceOf[Long]))
+                        case d: java.util.Date => d
+                        case _ => Timestamp.toLogical(schema, value.asInstanceOf[Long])
                       }
                     case _ => value
                   }
